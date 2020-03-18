@@ -47,11 +47,8 @@ def destinations():
     msg = Message()
     while msg.is_reply() == False:
         msg = eng.receive_msg()
-    #dest = msg.get_parameters()
     dest = msg.body
-    dest2 = dest.split()
-    print(dest2)
-    #print("%s" % (msg.body))
+    print(dest)
     #exec_menu("9")
     return dest
  
@@ -93,9 +90,9 @@ list_dest = destinations()
 print("ok")
 choiceDest = input("Choisissez un renderer (n°) >>  ")
 ## test
-#eng.send_request(dev,[devicesAlive[int(choiceDevice)]],'set_destination("yo")',{})
-#eng.start()
-#eng.process_tx_msg()
+eng.send_request(dev,[devicesAlive[int(choiceDevice)]],'set_destination("yo")',{})
+eng.start()
+eng.process_tx_msg()
 
 def main():
     os.system('clear')

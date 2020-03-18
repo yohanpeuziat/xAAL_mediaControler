@@ -27,7 +27,7 @@ def main(addr):
     def set_destination(_dest):
 	# Met la valeur du media player a utiliser dans la variable "destination_media"
 	# destination_media.value = ...
-        print("Destination is set : " + dest)
+        print("Destination is set : " + _dest)
 
     def get_destinations():
 	# Interroge le dBus pour connaitre les media renderer en DLNA
@@ -71,7 +71,7 @@ def main(addr):
         print("Media is backing of 10 secondes")
     
     dev.add_method('get_attributes',get_attributes)
-    dev.add_method('set_destination(_dest)',set_destination)
+    dev.add_method('set_destination',set_destination)
     dev.add_method('get_destinations',get_destinations)
     dev.add_method('set_source',set_source)
     dev.add_method('get_sources',get_sources)   
