@@ -26,33 +26,38 @@ def main(addr):
     ########### Ensemble des methodes liees a la mise en place du media ##########
     def set_destination(_dest):
 	# Met la valeur du media player a utiliser dans la variable "destination_media"
-	# destination_media.value = ...
-        print("Destination is set : " + _dest)
+        destination_media.value = _dest
+        print("Destination \"" + _dest + "\" is set")
 
     def get_destinations():
 	# Interroge le dBus pour connaitre les media renderer en DLNA
 	# Envoie à l'utilisateur les destinations sous forme de liste
-        available_dest = {"rain":"rainning", "rend":"renderer"}
+        available_dest = {"renderer1":"salon", "renderer2":"cuisine"}
         print("Display destinations")
         return available_dest
 
-    def set_source():
+    def set_source(_src):
 	# Met la valeur du media server a utiliser dans la variable "source_media"
-        print("Source is set")
+        source_media.value = _src
+        print("Source \"" + _src + "\" is set")
 
     def get_sources():
 	# Interroge le dBus pour connaitre les media server en DLNA
-	# Stock le résultat dans la variable "available_source" qui est sous forme de 		list
+	# Envoie à l'utilisateur les medias sous forme de liste
+        available_media = {"media1":"NAS\\video1", "media2":"NAS\\video2"}
         print("Display sources")
+        return available_media
 
 
     ########## Ensemble des methodes liees a l'etat du media lorsqu'il est en cours de lecture #########
     def play():
         state_media.value = True
+        # Commande DLNA pour lancer le media
         print("%s Play" % dev)
     
     def pause():
         state_media.value = False
+        # Commande DLNA pour mettre le media sur pause
         print("%s Pause" % dev)
 
     def stop():

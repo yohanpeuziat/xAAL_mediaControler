@@ -2,7 +2,7 @@
 
 from xaal.lib import Device, Engine, tools, Message
 from xaal.tools import isalive
-import sys, os
+import sys, os, time
 
 
 # Execute menu
@@ -40,26 +40,37 @@ def pause():
 
 # Menu 3
 def destinations():
-    print("Menu destination !\n")
+    print("Liste des Renderer disponible\n")
     eng.send_request(dev,[devicesAlive[int(choiceDevice)]],'get_destinations',{})
     eng.start()	
     eng.process_tx_msg()
     msg = Message()
-    while msg.is_reply() == False:
+    t0 = time.time()
+    balise = True
+    # Reçois le message suivant uniquement si le temps d'attente est inférieur à
+    # 2 secondes et que la balise est à True
+    while time.time() < (t0 + 2) and balise:
         msg = eng.receive_msg()
+        # La balise passe à False si l'adresse source est égale à celle du
+        # controler et que l'action est un get_destinations
+        if msg.source == devicesAlive[int(choiceDevice)] and msg.action == 'get_destinations':
+            balise = False
     dest = msg.body
     print(dest)
+    ###### Voir pour réenvoyer le messge en cas d'échec de la réception
     #exec_menu("9")
     return dest
  
 # Menu 4
 def sources():
-    print("Menu source !\n")
+    print("Liste des Media disponible\n")
     eng.send_request(dev,[devicesAlive[int(choiceDevice)]],'get_sources',{})
     eng.start()	
     eng.process_tx_msg()
     msg = Message()
-    while msg.is_reply() == False:
+    # Reçois le message suivant uniquement si l'adresse source est différente du
+    # controler ou que l'action n'est pas un get_sources
+    while msg.source != devicesAlive[int(choiceDevice)] or msg.action != 'get_sources':
         msg = eng.receive_msg()
     src = msg.get_parameters()
     print(src)
@@ -73,26 +84,6 @@ def back():
 # Exit program - Menu 0
 def exit():
     sys.exit()
-
-# Main definition - constants
-menu_actions  = {}
-addr = "f2fc6dac-4ffb-11ea-a473-0800276d39fa"
-dev = Device("basic.basic", addr)
-eng = Engine()
-eng.add_device(dev)
-addrMedia = ""
-#### Choix du controler
-devicesAlive = isalive.search(eng)
-choiceDevice = input("Choisissez un device a controler (n°) >>  ")
-os.system('clear')
-#### Choix du renderer
-list_dest = destinations()
-print("ok")
-choiceDest = input("Choisissez un renderer (n°) >>  ")
-## test
-eng.send_request(dev,[devicesAlive[int(choiceDevice)]],'set_destination("yo")',{})
-eng.start()
-eng.process_tx_msg()
 
 def main():
     os.system('clear')
@@ -109,6 +100,13 @@ def main():
     exec_menu(choice)
 
 
+# Main definition
+addr = "f2fc6dac-4ffb-11ea-a473-0800276d39fa"
+dev = Device("basic.basic", addr)
+eng = Engine()
+eng.add_device(dev)
+addrMedia = ""
+
 # Menu definition
 menu_actions = {
     'main_menu': main,
@@ -118,6 +116,27 @@ menu_actions = {
     '9': back,
     '0': exit,
 }
+
+#### Choix du controler
+devicesAlive = isalive.search(eng,"controlerMedia.basic")
+choiceDevice = input("Choisissez un device a controler (n°) >>  ")
+os.system('clear')
+#### Choix du renderer
+list_dest = destinations()
+choiceDest = input("Choisissez un renderer (renderer : XXX) >>  ")
+#### Mise en place du renderer
+eng.send_request(dev,[devicesAlive[int(choiceDevice)]],'set_destination',{'dest':choiceDest})
+eng.start()
+eng.process_tx_msg()
+os.system('clear')
+#### Choix du media
+list_media = sources()
+choiceMedia = input("Choisissez un media (media : XXX) >>  ")
+#### Mise en place du media
+eng.send_request(dev,[devicesAlive[int(choiceDevice)]],'set_source',{'src':choiceMedia})
+eng.start()
+eng.process_tx_msg()
+
 
 if __name__ =='__main__':
     try:
